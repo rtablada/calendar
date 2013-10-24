@@ -6,13 +6,22 @@ use Mockery as m;
 
 class CalendarBuilderTest extends PHPUnit_Framework_TestCase
 {
+	protected $dateArray = array(
+		'year' => 2012,
+		'month' => 01,
+		'day' => 04,
+	);
+
 	public function setup()
 	{
 		$this->builder = new CalendarBuilder(new Carbon);
 		$this->request = m::mock('Illuminate\\Http\\Request');
 		$this->builder->setRequest($this->request);
 
-		$this->date = Carbon::now()->year(2012)->month(01)->day(04);
+		$this->date = Carbon::now()
+			->year($this->dateArray['year'])
+			->month($this->dateArray['month'])
+			->day($this->dateArray['day']);
 	}
 
 	public function test_getDateFromInput_with_null_input()
@@ -111,6 +120,46 @@ class CalendarBuilderTest extends PHPUnit_Framework_TestCase
 			->andReturn($this->date->day);
 
 		$response = $this->builder->getDateFromInput($this->date);
+
+		$this->assertEquals($this->date->year(date('Y')), $response);
+	}
+
+	public function test_getDateFromInput_with_array_and_input()
+	{
+		$this->request->shouldReceive('input')
+			->with('year', $this->date->year)
+			->once()
+			->andReturn(date('Y'));
+		$this->request->shouldReceive('input')
+			->with('month', $this->date->month)
+			->once()
+			->andReturn($this->date->month);
+		$this->request->shouldReceive('input')
+			->with('day', $this->date->day)
+			->once()
+			->andReturn($this->date->day);
+
+		$response = $this->builder->getDateFromInput($this->dateArray);
+
+		$this->assertEquals($this->date->year(date('Y')), $response);
+	}
+
+	public function test_getDateFromInput_with_args()
+	{
+		$this->request->shouldReceive('input')
+			->with('year', $this->date->year)
+			->once()
+			->andReturn(date('Y'));
+		$this->request->shouldReceive('input')
+			->with('month', $this->date->month)
+			->once()
+			->andReturn($this->date->month);
+		$this->request->shouldReceive('input')
+			->with('day', $this->date->day)
+			->once()
+			->andReturn($this->date->day);
+
+		$response = $this->builder->getDateFromInput($this->dateArray['day'], $this->dateArray['month'], $this->dateArray['year']);
 
 		$this->assertEquals($this->date->year(date('Y')), $response);
 	}

@@ -30,6 +30,16 @@ class CalendarBuilder
 			$year = $dateOptions->year;
 			$month = $dateOptions->month;
 			$day = $dateOptions->day;
+		} elseif (is_array($dateOptions)) {
+			$year = isset($dateOptions['year']) ?: date('y');
+			$month = isset($dateOptions['month']) ?: date('m');
+			$day = isset($dateOptions['day']) ?: date('d');
+		} else {
+			$dateOptions = func_get_args();
+
+			$year = isset($dateOptions[2]) ?: date('y');
+			$month = isset($dateOptions[1]) ?: date('m');
+			$day = isset($dateOptions[0]) ?: date('d');
 		}
 
 		$year = $this->request->input('year', $year);
