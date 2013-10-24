@@ -1,7 +1,7 @@
 <?php
 
 use Rtablada\Calendar\CalendarBuilder;
-use Carbon\Carbon;
+use Rtablada\Calendar\CalendarDate;
 use Mockery as m;
 
 class CalendarBuilderTest extends PHPUnit_Framework_TestCase
@@ -14,19 +14,19 @@ class CalendarBuilderTest extends PHPUnit_Framework_TestCase
 
 	public function setup()
 	{
-		$this->builder = new CalendarBuilder(new Carbon);
+		$this->builder = new CalendarBuilder(new CalendarDate);
 		$this->request = m::mock('Illuminate\\Http\\Request');
 		$this->view = m::mock('Illuminate\\View\\Environment');
 		$this->builder->setRequest($this->request);
 		$this->builder->setView($this->view);
 
-		$this->date = Carbon::now()
+		$this->date = CalendarDate::now()
 			->year($this->dateArray['year'])
 			->month($this->dateArray['month'])
 			->day($this->dateArray['day']);
 	}
 
-	public function test_getDateFromInput_with_null_input()
+	public function setupDefaultDate()
 	{
 		$this->request->shouldReceive('input')
 			->with('year', date('Y'))
@@ -40,10 +40,15 @@ class CalendarBuilderTest extends PHPUnit_Framework_TestCase
 			->with('day', date('d'))
 			->once()
 			->andReturn(date('d'));
+	}
+
+	public function test_getDateFromInput_with_null_input()
+	{
+		$this->setupDefaultDate();
 
 		$response = $this->builder->getDateFromInput();
 
-		$this->assertEquals(Carbon::now(), $response);
+		$this->assertEquals(CalendarDate::now(), $response);
 	}
 
 	public function test_getDateFromInput_with_day_input()
@@ -63,7 +68,7 @@ class CalendarBuilderTest extends PHPUnit_Framework_TestCase
 
 		$response = $this->builder->getDateFromInput();
 
-		$this->assertEquals(Carbon::now()->day($this->date->day), $response);
+		$this->assertEquals(CalendarDate::now()->day($this->date->day), $response);
 	}
 
 	public function test_getDateFromInput_with_all_input()
@@ -168,18 +173,48 @@ class CalendarBuilderTest extends PHPUnit_Framework_TestCase
 
 	public function test_monthLinks()
 	{
-		$carbon = Carbon::now();
-		$active = Carbon::now();
-		$shown = array();
+		$this->setupDefaultDate();
+
+		$carbon = CalendarDate::now();
+		$active = CalendarDate::now();
+		$previous = $carbon->subMonth(1);
+		$next = $carbon->addMonth(1);
+		$months = array();
 
 		for ($i = 1; $i <= 12; $i++) {
 			if ($i != $active->month) {
-				$shown[] = $carbon->month($i);
+				$months[] = $carbon->month($i);
+			} else {
+				$months[] = $active;
 			}
 		}
 
 		$this->view->shouldReceive('make')
-			->with('calendar::month', compact('shown', 'active'));
+			->with('calendar::month', compact('months', 'next', 'previous'));
 		$this->builder->monthLinks();
+	}
+
+	public function test_monthLinks_withoutLinks()
+	{
+		$this->setupDefaultDate();
+
+		$carbon = CalendarDate::now();
+		$active = CalendarDate::now()->active();
+		$previous = null;
+		$next = null;
+		$months = array();
+
+		for ($i = 1; $i <= 12; $i++) {
+			if ($i != $active->month) {
+				$month = $carbon->month($i);
+				$months[] = $month;
+			} else {
+				$months[] = $active;
+			}
+		}
+
+		$this->view->shouldReceive('make')
+			->with('calendar::month', compact('months', 'next', 'previous'));
+		$this->builder->monthLinks(null, array('previous' => false, 'next' => false));
 	}
 }

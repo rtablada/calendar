@@ -2,7 +2,6 @@
 
 use Illuminate\Http\Request;
 use Illuminate\View\Environment as View;
-use Carbon\Carbon;
 
 class CalendarBuilder
 {
@@ -10,11 +9,11 @@ class CalendarBuilder
 
 	protected $view;
 
-	protected $carbon;
+	protected $calendarDate;
 
-	public function __construct(Carbon $carbon)
+	public function __construct(CalendarDate $calendarDate)
 	{
-		$this->carbon = $carbon;
+		$this->calendarDate = $calendarDate;
 	}
 
 	public function setRequest(Request $request)
@@ -54,21 +53,26 @@ class CalendarBuilder
 		$month = $this->request->input('month', $month);
 		$day = $this->request->input('day', $day);
 
-		return $this->carbon->now()->year($year)->month($month)->day($day);
+		return $this->calendarDate->now()->year($year)->month($month)->day($day);
 	}
 
 	public function monthLinks($currentDate = null, array $options = array())
 	{
-		$carbon = $this->carbon->now();
-		$active = $this->carbon->now();
-		$shown = array();
+		$calendarDate = $this->calendarDate->now();
+		$active = $this->getDateFromInput($currentDate)->active();
+		$previous	= (!isset($options['previous'])	|| $options['previous']) ? $calendarDate->subMonth(1)	: null;
+		$next 		= (!isset($options['next'])		|| $options['next']) ? $calendarDate->subMonth(1)		: null;
+		$months = array();
 
 		for ($i = 1; $i <= 12; $i++) {
 			if ($i != $active->month) {
-				$shown[] = $carbon->month($i);
+				$month = $calendarDate->month($i);
+				$months[] = $month;
+			} else {
+				$months[] = $active;
 			}
 		}
 
-		return $this->view->make('calendar::month', compact('shown', 'active'));
+		return $this->view->make('calendar::month', compact('months', 'next', 'previous'));
 	}
 }
