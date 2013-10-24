@@ -175,13 +175,13 @@ class CalendarBuilderTest extends PHPUnit_Framework_TestCase
 	{
 		$this->setupDefaultDate();
 
-		$carbon = CalendarDate::now();
 		$active = CalendarDate::now();
-		$previous = $carbon->subMonth(1);
-		$next = $carbon->addMonth(1);
+		$previous = $active->subMonth(1);
+		$next = $active->addMonth(1);
 		$months = array();
 
 		for ($i = 1; $i <= 12; $i++) {
+			$carbon = CalendarDate::now();
 			$month = $carbon->month($i);
 
 			if ($i == $active->month) {
@@ -200,13 +200,13 @@ class CalendarBuilderTest extends PHPUnit_Framework_TestCase
 	{
 		$this->setupDefaultDate();
 
-		$carbon = CalendarDate::now();
 		$active = CalendarDate::now()->active();
 		$previous = null;
 		$next = null;
 		$months = array();
 
 		for ($i = 1; $i <= 12; $i++) {
+			$carbon = CalendarDate::now();
 			$month = $carbon->month($i);
 
 			if ($i == $active->month) {
@@ -225,13 +225,13 @@ class CalendarBuilderTest extends PHPUnit_Framework_TestCase
 	{
 		$this->setupDefaultDate();
 
-		$carbon = CalendarDate::now();
 		$active = CalendarDate::now()->active();
-		$previous = $carbon->subMonth(1);
-		$next = $carbon->addMonth(1);
+		$previous = $active->subMonth(1);
+		$next = $active->addMonth(1);
 		$months = array();
 
 		for ($i = 1; $i <= 12; $i++) {
+			$carbon = CalendarDate::now();
 			$month = $carbon->month($i);
 
 			if ($i == $active->month) {
