@@ -56,6 +56,31 @@ class CalendarBuilder
 		return $this->calendarDate->now()->year($year)->month($month)->day($day);
 	}
 
+	public function yearLinks($selectedDate = null, $startYear=null, $endYear=null, array $options = array())
+	{
+		$selected = $this->getDateFromInput($selectedDate)->active();
+		$current = $this->calendarDate->now();
+		$previous =
+			(!isset($options['previous']) || $options['previous'])
+			? $selected->newInstance()->subYear()
+			: null;
+		$next = (!isset($options['next']) || $options['next'])
+			? $selected->newInstance()->addYear()
+			: null;
+		$startYear = $startYear ?: $previous->year;
+		$endYear = $endYear ?: $next->year;
+		$years = array();
+
+		for ($i = $startYear; $i <= $endYear; $i ++) {
+			$calendarDate = $selected->newInstance();
+			$year = $calendarDate->year($i);
+
+			$years[] = $this->setDisplayForDate($year, $selected, $current, $options);;
+		}
+
+		return $this->view->make('calendar::year', compact('years', 'next', 'previous'));
+	}
+
 	public function monthLinks($selectedDate = null, array $options = array())
 	{
 		$selected = $this->getDateFromInput($selectedDate)->active();
@@ -73,21 +98,26 @@ class CalendarBuilder
 			$calendarDate = $selected->newInstance();
 			$month = $calendarDate->month($i);
 
-			if ($i == $selected->month) {
-				$month->display('active');
-			} elseif (isset($options['before_selected']) && $month->lt($selected)) {
-				$month->display($options['before_selected']);
-			} elseif (isset($options['after_selected']) && $month->gt($selected)) {
-				$month->display($options['before_selected']);
-			} elseif (isset($options['before_current']) && $month->lt($current)) {
-				$month->display($options['before_current']);
-			} elseif (isset($options['after_current']) && $month->gt($current)) {
-				$month->display($options['after_current']);
-			}
-
-			$months[] = $month;
+			$months[] = $this->setDisplayForDate($month, $selected, $current, $options);
 		}
 
 		return $this->view->make('calendar::month', compact('months', 'next', 'previous'));
+	}
+
+	protected function setDisplayForDate($date, $selected, $current, $options)
+	{
+		if ($date->eq($selected)) {
+			$date->display('active');
+		} elseif (isset($options['before_selected']) && $date->lt($selected)) {
+			$date->display($options['before_selected']);
+		} elseif (isset($options['after_selected']) && $date->gt($selected)) {
+			$date->display($options['before_selected']);
+		} elseif (isset($options['before_current']) && $date->lt($current)) {
+			$date->display($options['before_current']);
+		} elseif (isset($options['after_current']) && $date->gt($current)) {
+			$date->display($options['after_current']);
+		}
+
+		return $date;
 	}
 }
