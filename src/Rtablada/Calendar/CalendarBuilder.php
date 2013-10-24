@@ -61,7 +61,7 @@ class CalendarBuilder
 		$selected = $this->getDateFromInput($selectedDate)->active();
 		$current = $this->calendarDate->now();
 		$previous	= (!isset($options['previous'])	|| $options['previous']) ? $selected->subMonth(1)	: null;
-		$next 		= (!isset($options['next'])		|| $options['next']) ? $selected->subMonth(1)		: null;
+		$next 		= (!isset($options['next'])		|| $options['next']) ? $selected->addMonth(1)		: null;
 		$months = array();
 
 		for ($i = 1; $i <= 12; $i++) {
@@ -69,7 +69,7 @@ class CalendarBuilder
 			$month = $calendarDate->month($i);
 
 			if ($i == $selected->month) {
-				$month->active();
+				$month->display('active');
 			} elseif (isset($options['before_selected']) && $i < $selected->month) {
 				$month->display($options['before_selected']);
 			} elseif (isset($options['after_selected']) && $i > $selected->month) {
