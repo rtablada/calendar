@@ -49,16 +49,24 @@ class CalendarBuilder
 			$day = isset($dateOptions[0]) ?: date('d');
 		}
 
-		$year = $this->request->input('year', $year);
-		$month = $this->request->input('month', $month);
-		$day = $this->request->input('day', $day);
+		$yearQuery = $this->request->input('year');
+		$monthQuery = $this->request->input('month');
+		$dayQuery = $this->request->input('day');
 
-		return $this->calendarDate->now()->year($year)->month($month)->day($day);
+		$year = $yearQuery ?: $year;
+		$month = $monthQuery ?: $month;
+		$day = $dayQuery ?: $day;
+
+		$date = $this->calendarDate->now()->year($year)->month($month)->day($day);
+		$date->setQueryDate($yearQuery, $monthQuery, $dayQuery);
+
+		return $date;
 	}
 
 	public function yearLinks($selectedDate = null, $startYear=null, $endYear=null, array $options = array())
 	{
 		$selected = $this->getDateFromInput($selectedDate)->active();
+		$selected->setCurrentDate($selected);
 		$current = $this->calendarDate->now();
 		$previous =
 			(!isset($options['previous']) || $options['previous'])
@@ -84,6 +92,7 @@ class CalendarBuilder
 	public function monthLinks($selectedDate = null, array $options = array())
 	{
 		$selected = $this->getDateFromInput($selectedDate)->active();
+		$selected->setCurrentDate($selected);
 		$current = $this->calendarDate->now();
 		$previous =
 			(!isset($options['previous']) || $options['previous'])
@@ -102,6 +111,32 @@ class CalendarBuilder
 		}
 
 		return $this->view->make('calendar::month', compact('months', 'next', 'previous'));
+	}
+
+	public function dayLinks($selectedDate = null, array $options = array())
+	{
+		$selected = $this->getDateFromInput($selectedDate)->active();
+		$selected->setCurrentDate($selected);
+		$current = $this->calendarDate->now();
+
+		$previous =
+			(!isset($options['previous']) || $options['previous'])
+			? $selected->newInstance()->subDay()
+			: null;
+		$next = (!isset($options['next']) || $options['next'])
+			? $selected->newInstance()->addDay()
+			: null;
+
+		$months = array();
+
+		for ($i = 1; $i <= $current->format('t') ; $i++) {
+			$calendarDate = $selected->newInstance();
+			$day = $calendarDate->day($i);
+
+			$days[] = $this->setDisplayForDate($day, $selected, $current, $options);
+		}
+
+		return $this->view->make('calendar::day', compact('days', 'next', 'previous'));
 	}
 
 	protected function setDisplayForDate($date, $selected, $current, $options)
