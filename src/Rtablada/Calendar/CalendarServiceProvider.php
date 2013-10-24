@@ -11,6 +11,11 @@ class CalendarServiceProvider extends ServiceProvider {
 	 */
 	protected $defer = false;
 
+	public function boot()
+	{
+		$this->package('rtablada/calendar');
+	}
+
 	/**
 	 * Register the service provider.
 	 *
@@ -18,7 +23,17 @@ class CalendarServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		//
+		$me = $this;
+
+		$this->app['calendar'] = $this->app->share(function($app) use ($me)
+		{
+			$builder = new CalendarBuilder(new CalendarDate);
+
+			$builder->setRequest($app['request']);
+			$builder->setView($app['view']);
+
+			return $builder;
+		});
 	}
 
 	/**
@@ -28,7 +43,7 @@ class CalendarServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array();
+		return array('calendar');
 	}
 
 }
