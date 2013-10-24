@@ -70,18 +70,18 @@ class CalendarBuilder
 		$months = array();
 
 		for ($i = 1; $i <= 12; $i++) {
-			$calendarDate = $this->calendarDate->now();
+			$calendarDate = $selected->newInstance();
 			$month = $calendarDate->month($i);
 
 			if ($i == $selected->month) {
 				$month->display('active');
-			} elseif (isset($options['before_selected']) && $i < $selected->month) {
+			} elseif (isset($options['before_selected']) && $month->lt($selected)) {
 				$month->display($options['before_selected']);
-			} elseif (isset($options['after_selected']) && $i > $selected->month) {
+			} elseif (isset($options['after_selected']) && $month->gt($selected)) {
 				$month->display($options['before_selected']);
-			} elseif (isset($options['before_current']) && ($selected->year < $current->year || $selected->year == $current->year && $i < $current->month)) {
+			} elseif (isset($options['before_current']) && $month->lt($current)) {
 				$month->display($options['before_current']);
-			} elseif (isset($options['after_current']) && ($selected->year > $current->year || $selected->year == $current->year && $i > $current->month)) {
+			} elseif (isset($options['after_current']) && $month->gt($current)) {
 				$month->display($options['after_current']);
 			}
 
