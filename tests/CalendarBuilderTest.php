@@ -182,11 +182,13 @@ class CalendarBuilderTest extends PHPUnit_Framework_TestCase
 		$months = array();
 
 		for ($i = 1; $i <= 12; $i++) {
-			if ($i != $active->month) {
-				$months[] = $carbon->month($i);
-			} else {
-				$months[] = $active;
+			$month = $carbon->month($i);
+
+			if ($i == $active->month) {
+				$month->active();
 			}
+
+			$months[] = $month;
 		}
 
 		$this->view->shouldReceive('make')
@@ -205,16 +207,44 @@ class CalendarBuilderTest extends PHPUnit_Framework_TestCase
 		$months = array();
 
 		for ($i = 1; $i <= 12; $i++) {
-			if ($i != $active->month) {
-				$month = $carbon->month($i);
-				$months[] = $month;
-			} else {
-				$months[] = $active;
+			$month = $carbon->month($i);
+
+			if ($i == $active->month) {
+				$month->active();
 			}
+
+			$months[] = $month;
 		}
 
 		$this->view->shouldReceive('make')
 			->with('calendar::month', compact('months', 'next', 'previous'));
 		$this->builder->monthLinks(null, array('previous' => false, 'next' => false));
+	}
+
+	public function test_monthLinks_hideBeforeSelected()
+	{
+		$this->setupDefaultDate();
+
+		$carbon = CalendarDate::now();
+		$active = CalendarDate::now()->active();
+		$previous = $carbon->subMonth(1);
+		$next = $carbon->addMonth(1);
+		$months = array();
+
+		for ($i = 1; $i <= 12; $i++) {
+			$month = $carbon->month($i);
+
+			if ($i == $active->month) {
+				$month->active();
+			} elseif ($i < $active->month) {
+				$month->display('hide');
+			}
+
+			$months[] = $month;
+		}
+
+		$this->view->shouldReceive('make')
+			->with('calendar::month', compact('months', 'next', 'previous'));
+		$this->builder->monthLinks(null, array('before_selected' => 'hide'));
 	}
 }

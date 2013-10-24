@@ -56,21 +56,31 @@ class CalendarBuilder
 		return $this->calendarDate->now()->year($year)->month($month)->day($day);
 	}
 
-	public function monthLinks($currentDate = null, array $options = array())
+	public function monthLinks($selectedDate = null, array $options = array())
 	{
 		$calendarDate = $this->calendarDate->now();
-		$active = $this->getDateFromInput($currentDate)->active();
+		$selected = $this->getDateFromInput($selectedDate)->active();
+		$current = $this->calendarDate->now();
 		$previous	= (!isset($options['previous'])	|| $options['previous']) ? $calendarDate->subMonth(1)	: null;
 		$next 		= (!isset($options['next'])		|| $options['next']) ? $calendarDate->subMonth(1)		: null;
 		$months = array();
 
 		for ($i = 1; $i <= 12; $i++) {
-			if ($i != $active->month) {
-				$month = $calendarDate->month($i);
-				$months[] = $month;
-			} else {
-				$months[] = $active;
+			$month = $calendarDate->month($i);
+
+			if ($i == $selected->month) {
+				$month->active();
+			} elseif (isset($options['before_selected']) && $i < $selected->month) {
+				$month->display($options['before_selected']);
+			} elseif (isset($options['after_selected']) && $i > $selected->month) {
+				$month->display($options['before_selected']);
+			} elseif ($current->year <= $selected->year && isset($options['before_current']) && $i < $current->month) {
+				$month->display($options['before_current']);
+			} elseif ($current->year >= $selected->year && isset($options['after_current']) && $i > $current->month) {
+				$month->display($options['after_current']);
 			}
+
+			$months[] = $month;
 		}
 
 		return $this->view->make('calendar::month', compact('months', 'next', 'previous'));
