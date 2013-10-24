@@ -79,9 +79,9 @@ class CalendarBuilder
 				$month->display($options['before_selected']);
 			} elseif (isset($options['after_selected']) && $i > $selected->month) {
 				$month->display($options['before_selected']);
-			} elseif (isset($options['before_current']) && ($selected->year < $current->year || $i < $current->month)) {
+			} elseif (isset($options['before_current']) && ($selected->year < $current->year || $selected->year == $current->year && $i < $current->month)) {
 				$month->display($options['before_current']);
-			} elseif (isset($options['after_current']) && ($selected->year > $current->year || $i > $current->month)) {
+			} elseif (isset($options['after_current']) && ($selected->year > $current->year || $selected->year == $current->year && $i > $current->month)) {
 				$month->display($options['after_current']);
 			}
 
