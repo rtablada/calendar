@@ -23,11 +23,21 @@ class CalendarBuilder
 	{
 		// No date means get the input and default to today
 		if ($dateOptions == null) {
-			$year = $this->request->input('year', date('Y'));
-			$month = $this->request->input('month', date('m'));
-			$day = $this->request->input('day', date('d'));
-
-			return $this->carbon->now()->year($year)->month($month)->day($day);
+			$year = date('Y');
+			$month = date('m');
+			$day = date('d');
 		}
+
+		if (is_a($dateOptions, 'Carbon\\Carbon')) {
+			$year = $dateOptions->year;
+			$month = $dateOptions->month;
+			$day = $dateOptions->day;
+		}
+
+		$year = $this->request->input('year', $year);
+		$month = $this->request->input('month', $month);
+		$day = $this->request->input('day', $day);
+
+		return $this->carbon->now()->year($year)->month($month)->day($day);
 	}
 }
