@@ -1,11 +1,14 @@
 <?php namespace Rtablada\Calendar;
 
 use Illuminate\Http\Request;
+use Illuminate\View\Environment as View;
 use Carbon\Carbon;
 
 class CalendarBuilder
 {
 	protected $request;
+
+	protected $view;
 
 	protected $carbon;
 
@@ -17,6 +20,11 @@ class CalendarBuilder
 	public function setRequest(Request $request)
 	{
 		$this->request = $request;
+	}
+
+	public function setView(View $view)
+	{
+		$this->view = $view;
 	}
 
 	public function getDateFromInput($dateOptions = null)
@@ -47,5 +55,20 @@ class CalendarBuilder
 		$day = $this->request->input('day', $day);
 
 		return $this->carbon->now()->year($year)->month($month)->day($day);
+	}
+
+	public function monthLinks($currentDate = null, array $options = array())
+	{
+		$carbon = $this->carbon->now();
+		$active = $this->carbon->now();
+		$shown = array();
+
+		for ($i = 1; $i <= 12; $i++) {
+			if ($i != $active->month) {
+				$shown[] = $carbon->month($i);
+			}
+		}
+
+		return $this->view->make('calendar::month', compact('shown', 'active'));
 	}
 }

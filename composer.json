@@ -11,6 +11,7 @@
 		"php": ">=5.3.0",
 		"illuminate/support": "4.0.x",
 		"illuminate/http": "4.0.x",
+		"illuminate/view": "4.0.x",
 		"nesbot/carbon": "1.4.x"
 	},
 	"require-dev": {

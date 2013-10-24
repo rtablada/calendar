@@ -16,7 +16,9 @@ class CalendarBuilderTest extends PHPUnit_Framework_TestCase
 	{
 		$this->builder = new CalendarBuilder(new Carbon);
 		$this->request = m::mock('Illuminate\\Http\\Request');
+		$this->view = m::mock('Illuminate\\View\\Environment');
 		$this->builder->setRequest($this->request);
+		$this->builder->setView($this->view);
 
 		$this->date = Carbon::now()
 			->year($this->dateArray['year'])
@@ -162,5 +164,22 @@ class CalendarBuilderTest extends PHPUnit_Framework_TestCase
 		$response = $this->builder->getDateFromInput($this->dateArray['day'], $this->dateArray['month'], $this->dateArray['year']);
 
 		$this->assertEquals($this->date->year(date('Y')), $response);
+	}
+
+	public function test_monthLinks()
+	{
+		$carbon = Carbon::now();
+		$active = Carbon::now();
+		$shown = array();
+
+		for ($i = 1; $i <= 12; $i++) {
+			if ($i != $active->month) {
+				$shown[] = $carbon->month($i);
+			}
+		}
+
+		$this->view->shouldReceive('make')
+			->with('calendar::month', compact('shown', 'active'));
+		$this->builder->monthLinks();
 	}
 }
