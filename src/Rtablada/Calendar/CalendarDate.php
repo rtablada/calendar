@@ -19,4 +19,9 @@ class CalendarDate extends \Carbon\Carbon
 
 		return $this;
 	}
+
+	public function newInstance()
+	{
+		return new static($this);
+	}
 }
