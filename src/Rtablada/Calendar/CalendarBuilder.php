@@ -26,9 +26,7 @@ class CalendarBuilder
 			$year = date('Y');
 			$month = date('m');
 			$day = date('d');
-		}
-
-		if (is_a($dateOptions, 'Carbon\\Carbon')) {
+		} elseif (is_a($dateOptions, 'Carbon\\Carbon')) {
 			$year = $dateOptions->year;
 			$month = $dateOptions->month;
 			$day = $dateOptions->day;
