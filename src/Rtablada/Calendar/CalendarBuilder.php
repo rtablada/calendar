@@ -129,7 +129,7 @@ class CalendarBuilder
 
 		$months = array();
 
-		for ($i = 1; $i <= $current->format('t') ; $i++) {
+		for ($i = 1; $i <= $selected->format('t') ; $i++) {
 			$calendarDate = $selected->newInstance();
 			$day = $calendarDate->day($i);
 
