@@ -58,14 +58,14 @@ class CalendarBuilder
 
 	public function monthLinks($selectedDate = null, array $options = array())
 	{
-		$calendarDate = $this->calendarDate->now();
 		$selected = $this->getDateFromInput($selectedDate)->active();
 		$current = $this->calendarDate->now();
-		$previous	= (!isset($options['previous'])	|| $options['previous']) ? $calendarDate->subMonth(1)	: null;
-		$next 		= (!isset($options['next'])		|| $options['next']) ? $calendarDate->subMonth(1)		: null;
+		$previous	= (!isset($options['previous'])	|| $options['previous']) ? $selected->subMonth(1)	: null;
+		$next 		= (!isset($options['next'])		|| $options['next']) ? $selected->subMonth(1)		: null;
 		$months = array();
 
 		for ($i = 1; $i <= 12; $i++) {
+			$calendarDate = $this->calendarDate->now();
 			$month = $calendarDate->month($i);
 
 			if ($i == $selected->month) {
